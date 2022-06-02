@@ -22,8 +22,7 @@ distributionHoldupQueue.worker.on('completed', async (job) => {
 
 reportPublishingQueue.worker.on('completed', async (job) => {
   console.log(`Report Publishing Completed for: ${job.data.reportNo}`)
-  webDistributionQueue.queue.add('HandleWebDistribution', jobData);  
-  //await handleDistribution(job.data.reportNo, job.data.accessionOrder);
+  webDistributionQueue.queue.add('HandleWebDistribution', job.data);    
 });
 
 webDistributionQueue.worker.on('completed', async (job) => {
