@@ -27,7 +27,7 @@ async function handleJob(job) {
   console.log(updatedAo);
 }
 
-const reportPublishingQueue = {};
-reportPublishingQueue.queue = queue;
-reportPublishingQueue.worker = worker;
-export default reportPublishingQueue;
+const webDistributionQueue = {};
+webDistributionQueue.queue = queue;
+webDistributionQueue.worker = worker;
+export default webDistributionQueue;
