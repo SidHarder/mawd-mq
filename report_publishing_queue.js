@@ -15,7 +15,7 @@ const worker = new Worker('ReportPublishing', handleJob, { connection });
 
 async function handleJob(job) {  
   console.log(`Publishing report for: ${job.data.reportNo}`);
-  var url = `${process.env.HTTP_REPORT_PUBLISH_URL}${job.reportNo}`;
+  var url = `${process.env.HTTP_REPORT_PUBLISH_URL}${job.data.reportNo}`;
   console.log(url);
   const response = await fetch(url);
   const body = await response.text();
