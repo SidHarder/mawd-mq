@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 import { Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import { QueueScheduler } from 'bullmq';
@@ -21,6 +23,7 @@ async function handleJob(job) {
   try {
     const response = await fetch(url);
     const body = await response.text();
+    console.log(body);
   } catch (e) {
     console.log(e);
   }  
