@@ -7,18 +7,21 @@ import reportPublishingQueue from './report_publishing_queue.js';
 const distributionRouter = {};
 
 async function submitJob(args, cb) {
+  console.log(`Holding up distribution for: ${args[0].reportNo}`);
   await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo });  
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` })
 }
 
 distributionHoldupQueue.worker.on('completed', async (job) => {
+  console.log(`Holding up distribution is complete for: ${args[0].reportNo}`);  
   var aoResult = await mawdApi.getAccessionOrder(job.data.reportNo);
   var jobData = { accessionOrder: aoResult.result.accessionOrder, reportNo: job.data.reportNo }
+  console.log(`Publishing report for: ${args[0].reportNo}`);
   reportPublishingQueue.queue.add('PublishReport', jobData);  
 });
 
 reportPublishingQueue.worker.on('completed', async (job) => {
-  console.log(`Report Publishing Complete: ${job.data.accessionOrder.masterAccessionNo}`)
+  console.log(`Report Publishing Complete for: ${job.data.accessionOrder.masterAccessionNo}`)
   await handleDistribution(job.data.reportNo, job.data.accessionOrder);
 });
 

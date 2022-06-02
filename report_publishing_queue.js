@@ -14,11 +14,10 @@ const queue = new Queue('ReportPublishing', {
 const worker = new Worker('ReportPublishing', handleJob, { connection });
 
 async function handleJob(job) {  
-  console.log(`Publishing: ${job.data.reportNo}`);
-  //const response = await fetch(`${process.env.HTTP_REPORT_PUBLISH_URL}${job.reportNo}`);
-  //const body = await response.text();
+  console.log(`Publishing report for: ${job.data.reportNo}`);
+  const response = await fetch(`${process.env.HTTP_REPORT_PUBLISH_URL}${job.reportNo}`);
+  const body = await response.text();
 }
-
 
 const reportPublishingQueue = {};
 reportPublishingQueue.queue = queue;
