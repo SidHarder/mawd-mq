@@ -17,9 +17,13 @@ async function handleJob(job) {
   console.log(`Publishing report for: ${job.data.reportNo}`);
   var url = `${process.env.HTTP_REPORT_PUBLISH_URL}${job.data.reportNo}`;
   console.log(url);
-  const response = await fetch(url);
-  const body = await response.text();
-  console.log(body);
+
+  try {
+    const response = await fetch(url);
+    const body = await response.text();
+  } catch (e) {
+    console.log(e);
+  }  
 }
 
 const reportPublishingQueue = {};
