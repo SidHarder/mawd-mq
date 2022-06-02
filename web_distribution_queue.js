@@ -15,16 +15,19 @@ const worker = new Worker('WebDistribution', handleJob, { connection });
 
 async function handleJob(job) {
   console.log(`Handling web distribution for: ${job.data.reportNo}`);  
-  accessionOrder.testOrders.find(t => t.reportNo == reportNo).testOrderReportDistribution.forEach(d => {
-    if (d.distributionType == 'Web') {
-      d.distributed = true;
-      d.timeOfLastDistribution = moment().format('YYYYMMDDHHmmss')
-    }
-  });
+  try {
+    accessionOrder.testOrders.find(t => t.reportNo == job.data.reportNo).testOrderReportDistribution.forEach(d => {
+      if (d.distributionType == 'Web') {
+        d.distributed = true;
+        d.timeOfLastDistribution = moment().format('YYYYMMDDHHmmss')
+      }
+    });
 
-  accessionOrder.distributed = true;
-  var updatedAo = await mawdApi.updateAccessionOrder(accessionOrder);
-  console.log(updatedAo);
+    accessionOrder.distributed = true;
+    var updatedAo = await mawdApi.updateAccessionOrder(accessionOrder);
+  } catch (e) {
+    console.log(e);
+  }  
 }
 
 const webDistributionQueue = {};
