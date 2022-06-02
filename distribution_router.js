@@ -13,7 +13,7 @@ async function submitJob(args, cb) {
 }
 
 distributionHoldupQueue.worker.on('completed', async (job) => {
-  console.log(`Holding up distribution is complete for: ${args[0].reportNo}`);  
+  console.log(`Holding up distribution is complete for: ${job.data.reportNo}`);  
   var aoResult = await mawdApi.getAccessionOrder(job.data.reportNo);
   var jobData = { accessionOrder: aoResult.result.accessionOrder, reportNo: job.data.reportNo }
   console.log(`Publishing report for: ${args[0].reportNo}`);
