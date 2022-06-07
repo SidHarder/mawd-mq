@@ -1,6 +1,5 @@
 import { Queue } from 'bullmq';
 import { Worker } from 'bullmq';
-import { QueueScheduler } from 'bullmq';
 import IORedis from 'ioredis';
 
 import mawdApi from './mawd_api.js';
@@ -11,7 +10,7 @@ const queue = new Queue('Distribution_Holdup', {
   connection,
   defaultJobOptions: { removeOnComplete: true }
 });
-const queueScheduler = new QueueScheduler("Distribution_Holdup", { connection });
+
 const worker = new Worker('Distribution_Holdup', handleJob, { connection });
 
 async function handleJob(job) {      

@@ -3,7 +3,7 @@ import moment from 'moment';
 import mawdApi from './mawd_api.js';
 import distributionHoldupQueue from './distribution_holdup_queue.js';
 import reportPublishingQueue from './report_publishing_queue.js';
-import webDistributionQueue from './web_distribution_queue.js';
+import distributionStatusUpdateQueue from './distribution_status_update_queue.js';
 import faxDistributionQueue from './fax_distribution_queue.js';
 
 const distributionRouter = {};
@@ -22,17 +22,13 @@ distributionHoldupQueue.worker.on('completed', async (job) => {
 });
 
 reportPublishingQueue.worker.on('completed', async (job) => {
-  console.log(`Report Publishing Completed for: ${job.data.reportNo}`)
-  webDistributionQueue.queue.add('HandleWebDistribution', job.data);    
-  faxDistributionQueue.queue.add('HandleFaxDistribution', job.data);
+  console.log(`Report Publishing Completed for: ${job.data.reportNo}`);  
+  faxDistributionQueue.addFaxJob(job.data);
+  distributionStatusUpdateQueue.queue.add('HandleDistributionStatusUpdate', job.data);
 });
 
-webDistributionQueue.worker.on('completed', async (job) => {
-  console.log(`Web distribution completed for: ${job.data.reportNo}`)  
-});
-
-faxDistributionQueue.worker.on('completed', async (job) => {
-  console.log(`Fax distribution completed for: ${job.data.reportNo}`)
+distributionStatusUpdateQueue.worker.on('completed', async (job) => {
+  console.log(`Distribution status as been updated for: ${job.data.reportNo}`);
 });
 
 distributionRouter.submitJob = submitJob;

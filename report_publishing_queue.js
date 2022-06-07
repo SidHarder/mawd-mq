@@ -7,7 +7,6 @@ import IORedis from 'ioredis';
 import mawdApi from './mawd_api.js';
 
 const connection = new IORedis(6379, "//localhost", { maxRetriesPerRequest: null });
-const queueScheduler = new QueueScheduler("ReportDistribution", { connection });
 const queue = new Queue('ReportPublishing', {
   connection,
   defaultJobOptions: { removeOnComplete: true }
@@ -20,6 +19,7 @@ async function handleJob(job) {
   var url = `${process.env.HTTP_REPORT_PUBLISH_URL}${job.data.reportNo}`;
   console.log(url);
 
+  if (process.env.ENVIRONMENT_NAME != 'dev')
   try {
     const response = await fetch(url);
     const body = await response.text();

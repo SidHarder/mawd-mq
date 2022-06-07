@@ -317,7 +317,14 @@
   dependencies:
     "brace-expansion" "^1.1.7"
 
-"moment@^2.29.3":
+"moment-timezone@^0.5.31":
+  "integrity" "sha512-3zAEHh2hKUs3EXLESx/wsgw6IQdusOT8Bxm3D9UrHPQR7zlMmzwybC8zHEM1tQ4LJwP7fcxrWr8tuBg05fFCbg=="
+  "resolved" "https://registry.npmjs.org/moment-timezone/-/moment-timezone-0.5.34.tgz"
+  "version" "0.5.34"
+  dependencies:
+    "moment" ">= 2.9.0"
+
+"moment@^2.29.3", "moment@>= 2.9.0":
   "integrity" "sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw=="
   "resolved" "https://registry.npmjs.org/moment/-/moment-2.29.3.tgz"
   "version" "2.29.3"
@@ -352,6 +359,13 @@
   "version" "1.5.7"
   optionalDependencies:
     "msgpackr-extract" "^1.1.4"
+
+"node-cron@^3.0.0":
+  "integrity" "sha512-DDwIvvuCwrNiaU7HEivFDULcaQualDv7KoNlB/UU1wPW0n1tDEmBJKhEIE6DlF2FuoOHcNbLJ8ITL2Iv/3AWmA=="
+  "resolved" "https://registry.npmjs.org/node-cron/-/node-cron-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "moment-timezone" "^0.5.31"
 
 "node-domexception@^1.0.0":
   "integrity" "sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ=="
