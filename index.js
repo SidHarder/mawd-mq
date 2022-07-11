@@ -2,11 +2,14 @@ import dotenv from 'dotenv'
 import jayson from 'jayson';
 
 import distributionRouter from './distribution_router.js';
+import delayInstrumentResult from './delayed_instrument_result_queue.js';
+import delayedInstrumentResultQueue from './delayed_instrument_result_queue.js';
 
 dotenv.config();
 
 const apiMethodMap = {
-  submitDistribution: distributionRouter.submitJob
+  submitDistribution: distributionRouter.submitJob,
+  submitDelayedResult: delayedInstrumentResultQueue.submitJob
 }
 
 const server = jayson.server(apiMethodMap);

@@ -13,7 +13,7 @@ async function getAccessionOrder (reportNo) {
         target: 'accessionOrder',
         method: 'getByReportNo',
         clinicalPathologyStyle: true,
-        aquireLock: true,
+        aquireLock: false,
         lockedBy: 'BOBJONES',
         reportNo: reportNo
       }
@@ -56,6 +56,30 @@ async function updateAccessionOrder(accessionOrder) {
   return data;
 }
 
+async function submitInfinityResult(apiParams) {
+  var apiRequest = {
+    jsonrpc: '2.0',
+    id: ObjectID(),
+    method: 'instrumentOperation',
+    params: [{
+      instrumentOperation: apiParams
+    }]
+  };
+
+  const response = await fetch(process.env.MAWD_API_URL, {
+    method: 'POST',
+    body: JSON.stringify(apiRequest),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  
+  try {
+    const data = await response.json();    
+  } catch (e) {
+    console.log(e);
+  }      
+}
+
 mawdApi.getAccessionOrder = getAccessionOrder;
 mawdApi.updateAccessionOrder = updateAccessionOrder;
+mawdApi.submitInfinityResult = submitInfinityResult;
 export default mawdApi;

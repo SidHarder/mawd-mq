@@ -15,7 +15,7 @@ const queue = new Queue('FaxDistribution', {
 
 const worker = new Worker('FaxDistribution', null, { autorun: true, connection });
 
-cron.schedule('*/10 * * * * *', async () => {
+cron.schedule('* * * * *', async () => {
   var waitingJobCount = await queue.getWaitingCount();  
   console.log(`Jobs waiting count: ${waitingJobCount}`);  
   for (var i=0; i<waitingJobCount; i++) {    
@@ -24,10 +24,9 @@ cron.schedule('*/10 * * * * *', async () => {
   }  
 });
 
-async function SendFax(faxJob) {
-  console.log(faxJob);
+async function SendFax(faxJob) {  
   var url = `${process.env.HTTP_SINGLE_FAX_URL}${faxJob.reportNo}`;
-  console.log(url);  
+  console.log(`Faxing: ${url}`);  
 
   /*
   try {

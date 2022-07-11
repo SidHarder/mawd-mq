@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 
 import { Queue } from 'bullmq';
 import { Worker } from 'bullmq';
-import { QueueScheduler } from 'bullmq';
 import IORedis from 'ioredis';
 import mawdApi from './mawd_api.js';
 
