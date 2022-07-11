@@ -40,13 +40,16 @@ async function SendFax(faxJob) {
 }
 
 async function addFaxJob(data) {
+  console.log('Not adding faxes at this time.');
+  /*
   var testOrder = data.accessionOrder.testOrders.find(t => t.reportNo == data.reportNo);
   var faxDistributions = testOrder.testOrderReportDistribution.filter(t => t.distributionType == 'Fax' && t.distributed == false);
   for(var i=0; i<faxDistributions.length; i++) {
     var faxJob = { reportNo: faxDistributions[i].reportNo, faxNumber: faxDistributions[i].faxNumber, clientName: faxDistributions[i].clientName };
     await queue.add('FaxDistribution', faxJob);
     console.log(`Adding fax distribution for: ${faxJob.reportNo} - ${faxJob.clientName}`);    
-  }  
+  } 
+  */ 
 }
 
 const faxDistributionQueue = {};
