@@ -10,15 +10,27 @@ const distributionRouter = {};
 
 async function submitJob(args, cb) {
   console.log(`Holding up distribution for: ${args[0].reportNo}`);
-  await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo }, { delay: 120000 });  
+  await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });  
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` })
 }
 
 distributionHoldupQueue.worker.on('completed', async (job) => {
   console.log(`Holding up distribution is complete for: ${job.data.reportNo}`);  
   var aoResult = await mawdApi.getAccessionOrder(job.data.reportNo);
-  var jobData = { accessionOrder: aoResult.result.accessionOrder, reportNo: job.data.reportNo }  
-  reportPublishingQueue.queue.add('PublishReport', jobData);  
+
+  if (aoResult.result.status == 'OK') {        
+    if(aoResult.result.lockAquiredByMe == true) {
+      console.log(`Accession found for: ${job.data.reportNo}, and lockAquiredByMe is: ${aoResult.result.lockAquiredByMe}`)
+      var jobData = { accessionOrder: aoResult.result.accessionOrder, reportNo: job.data.reportNo };
+      reportPublishingQueue.queue.add('PublishReport', jobData);  
+    } else {
+      await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: job.data.reportNo, runCount: job.data.runCount + 1 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });  
+      console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount}`);
+    }    
+  } else {
+
+    console.log(`Not able to find Accession Order for: ${job.data.reportNo}`);  
+  }  
 });
 
 reportPublishingQueue.worker.on('completed', async (job) => {

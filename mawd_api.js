@@ -13,8 +13,8 @@ async function getAccessionOrder (reportNo) {
         target: 'accessionOrder',
         method: 'getByReportNo',
         clinicalPathologyStyle: true,
-        aquireLock: false,
-        lockedBy: 'BOBJONES',
+        aquireLock: true,
+        lockedBy: process.env.LOCKED_BY_USER,
         reportNo: reportNo
       }
     }]
@@ -26,7 +26,8 @@ async function getAccessionOrder (reportNo) {
     headers: { 'Content-Type': 'application/json' }
   });
     
-  const data = await response.json();
+  const data = await response.json();  
+  data.result.lockAquiredByMe = (data.result.accessionOrder.lockedBy == process.env.LOCKED_BY_USER);  
   return data;
 }
 
