@@ -6,7 +6,10 @@ import { QueueScheduler } from 'bullmq';
 import IORedis from 'ioredis';
 import mawdApi from './mawd_api.js';
 
-const connection = new IORedis(6379, "//localhost", { maxRetriesPerRequest: null });
+
+var redisOptions = { port: 6379, host: "127.0.0.1", db: process.env.REDIS_DB, maxRetriesPerRequest: null };
+const connection = new IORedis(redisOptions);
+
 const queue = new Queue('DelayedInstrumentResultQueue', {
   connection,
   defaultJobOptions: { removeOnComplete: true }
