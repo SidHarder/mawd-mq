@@ -1,4 +1,4 @@
-import { Queue, QueueScheduler } from 'bullmq';
+import { Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import IORedis from 'ioredis';
 
@@ -13,7 +13,7 @@ const worker = new Worker('Distribution_Holdup', handleJob, { connection });
 //const queueScheduler = new QueueScheduler('Distribution_Holdup', { connection });
 
 async function handleJob(job) {      
-  console.log(job);
+  console.log('This is the worker function')
 }
 
 const distributionHoldupQueue = {};

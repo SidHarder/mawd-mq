@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 import { Queue } from 'bullmq';
 import { Worker } from 'bullmq';
-import { QueueScheduler } from 'bullmq';
+//import { QueueScheduler } from 'bullmq';
 import IORedis from 'ioredis';
 import mawdApi from './mawd_api.js';
 
@@ -15,7 +15,7 @@ const queue = new Queue('DelayedInstrumentResultQueue', {
   defaultJobOptions: { removeOnComplete: true }
 });
 
-const queueScheduler = new QueueScheduler('DelayedInstrumentResultQueue', { connection });
+//const queueScheduler = new QueueScheduler('DelayedInstrumentResultQueue', { connection });
 const worker = new Worker('DelayedInstrumentResultQueue', handleJob, { connection });
 
 async function handleJob(job) {
