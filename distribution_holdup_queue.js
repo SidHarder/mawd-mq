@@ -3,7 +3,6 @@ import { Worker } from 'bullmq';
 import IORedis from 'ioredis';
 
 const connection = new IORedis({ port: 6379, host: "127.0.0.1", db: process.env.REDIS_DB, maxRetriesPerRequest: null });
-const schedulerConn = new IORedis({ port: 6379, host: "127.0.0.1", db: process.env.REDIS_DB, maxRetriesPerRequest: null });
 
 const queue = new Queue('Distribution_Holdup', {
   connection,
@@ -11,7 +10,7 @@ const queue = new Queue('Distribution_Holdup', {
 });
 
 const worker = new Worker('Distribution_Holdup', handleJob, { connection });
-const queueScheduler = new QueueScheduler('Distribution_Holdup', { schedulerConn });
+//const queueScheduler = new QueueScheduler('Distribution_Holdup', { connection });
 
 async function handleJob(job) {      
   console.log(job);
