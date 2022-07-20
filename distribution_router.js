@@ -8,10 +8,11 @@ import faxDistributionQueue from './fax_distribution_queue.js';
 
 const distributionRouter = {};
 
-async function submitJob(args, cb) {
-  console.log(args)
+async function submitJob(args, cb) {  
   console.log(`Holding up distribution for: ${args[0].reportNo}`);
   await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });  
+  var cnt = await distributionHoldupQueue.queue.getDelayedCount();
+  console.log(`Holdup queue job count: ${cnt}`);
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` })
 }
 
@@ -30,9 +31,7 @@ distributionHoldupQueue.worker.on('completed', async (job) => {
     }    
   } else {
     console.log(`Not able to find Accession Order for: ${job.data.reportNo}`);  
-  }  
-
-  console.log('done');
+  }    
 });
 
 reportPublishingQueue.worker.on('completed', async (job) => {
