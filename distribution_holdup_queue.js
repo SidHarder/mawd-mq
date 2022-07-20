@@ -11,7 +11,7 @@ const queue = new Queue('Distribution_Holdup', {
 
 console.log('***************************************')
 const worker = new Worker('Distribution_Holdup', handleJob, { connection });
-//const queueScheduler = new QueueScheduler('Distribution_Holdup', { connection });
+const queueScheduler = new QueueScheduler('queue_scheduler');
 
 async function handleJob(job) {      
   console.log(`Worker is handling Job: ${job.id}`);
