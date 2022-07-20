@@ -9,6 +9,7 @@ import faxDistributionQueue from './fax_distribution_queue.js';
 const distributionRouter = {};
 
 async function submitJob(args, cb) {
+  console.log(args)
   console.log(`Holding up distribution for: ${args[0].reportNo}`);
   await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });  
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` })
