@@ -12,7 +12,7 @@ const worker = new Worker('Distribution_Holdup', handleJob, { connection });
 const queueScheduler = new QueueScheduler('Distribution_Holdup', { connection });
 
 async function handleJob(job) {      
-  //Do Nothing  
+  console.log(job);
 }
 
 const distributionHoldupQueue = {};
