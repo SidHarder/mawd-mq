@@ -9,11 +9,12 @@ const queue = new Queue('Distribution_Holdup', {
   defaultJobOptions: { removeOnComplete: true }
 });
 
+console.log('***************************************')
 const worker = new Worker('Distribution_Holdup', handleJob, { connection });
 //const queueScheduler = new QueueScheduler('Distribution_Holdup', { connection });
 
 async function handleJob(job) {      
-  console.log('This is the worker function')
+  console.log(`Worker is handling Job: ${job.id}`);
 }
 
 const distributionHoldupQueue = {};
