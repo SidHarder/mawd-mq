@@ -10,8 +10,8 @@ const distributionRouter = {};
 
 async function submitJob(args, cb) {  
   console.log(`Holding up distribution for: ${args[0].reportNo}`);
-  //await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });  
-  await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 });  
+  await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 }, { delay: 1000 });  
+  //await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 });  
   var cnt = await distributionHoldupQueue.queue.getDelayedCount();
   console.log(`Holdup queue job count: ${cnt}`);
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` })
