@@ -28,9 +28,10 @@ distributionHoldupQueue.worker.on('completed', async (job) => {
       console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount}`);
     }    
   } else {
-
     console.log(`Not able to find Accession Order for: ${job.data.reportNo}`);  
   }  
+
+  console.log('done');
 });
 
 reportPublishingQueue.worker.on('completed', async (job) => {
