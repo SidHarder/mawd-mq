@@ -42,8 +42,11 @@ async function addFaxJob(data) {
   var testOrder = data.accessionOrder.testOrders.find(t => t.reportNo == data.reportNo);
   var faxDistributions = testOrder.testOrderReportDistribution.filter(t => t.distributionType == 'Fax' && t.distributed == false);
   
+
   for(var i=0; i<faxDistributions.length; i++) {
     var faxJob = { reportNo: faxDistributions[i].reportNo, faxNumber: faxDistributions[i].faxNumber, clientName: faxDistributions[i].clientName };
+    if (process.env.ENVIRONMENT_NAME == 'dev' || process.env.ENVIRONMENT_NAME == 'test') faxJob.faxNumber = process.env.TEST_FAX_NUMBER;
+    
     await queue.add('FaxDistribution', faxJob);
     console.log(`Adding fax distribution for: ${faxJob.reportNo} - ${faxJob.clientName}`);    
   } 
