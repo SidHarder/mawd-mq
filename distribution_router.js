@@ -12,8 +12,9 @@ async function submitJob(args, cb) {
   console.log(`Holding up distribution for: ${args[0].reportNo}`);
   await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 }, { delay: 1000 });  
   //await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 });  
-  var cnt = await distributionHoldupQueue.queue.getDelayedCount();
-  console.log(`Holdup queue job count: ${cnt}`);
+  var delayedCnt = await distributionHoldupQueue.queue.getDelayedCount();
+  var failedCnt = await distributionHoldupQueue.queue.getFailedCount();
+  console.log(`Holdup queue job count: ${delayedCnt}, ${failedCnt}`);
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` })
 }
 
