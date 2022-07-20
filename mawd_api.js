@@ -27,6 +27,7 @@ async function getAccessionOrder (reportNo) {
   });
     
   const data = await response.json();  
+  console.log(data);
   data.result.lockAquiredByMe = (data.result.accessionOrder.lockedBy == process.env.LOCKED_BY_USER);  
   return data;
 }

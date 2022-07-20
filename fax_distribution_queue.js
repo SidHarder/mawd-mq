@@ -18,7 +18,7 @@ const worker = new Worker('FaxDistribution', null, { autorun: true, connection }
 
 cron.schedule('* * * * *', async () => {
   var waitingJobCount = await queue.getWaitingCount();  
-  console.log(`Jobs waiting count: ${waitingJobCount}`);  
+  console.log(`Fax jobs waiting count: ${waitingJobCount}`);  
   for (var i=0; i<waitingJobCount; i++) {    
     var faxJob = await worker.getNextJob('faxjob');    
     await SendFax(faxJob.data);
@@ -42,11 +42,10 @@ async function addFaxJob(data) {
   var testOrder = data.accessionOrder.testOrders.find(t => t.reportNo == data.reportNo);
   var faxDistributions = testOrder.testOrderReportDistribution.filter(t => t.distributionType == 'Fax' && t.distributed == false);
   
-
   for(var i=0; i<faxDistributions.length; i++) {
     var faxJob = { reportNo: faxDistributions[i].reportNo, faxNumber: faxDistributions[i].faxNumber, clientName: faxDistributions[i].clientName };
     if (process.env.ENVIRONMENT_NAME == 'dev' || process.env.ENVIRONMENT_NAME == 'test') faxJob.faxNumber = process.env.TEST_FAX_NUMBER;
-    
+
     await queue.add('FaxDistribution', faxJob);
     console.log(`Adding fax distribution for: ${faxJob.reportNo} - ${faxJob.clientName}`);    
   } 
