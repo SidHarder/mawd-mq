@@ -12,12 +12,13 @@ async function submitJob(args, cb) {
   console.log(`Holding up distribution for: ${args[0].reportNo}`);
   await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 }, { delay: 1000 });  
   //await distributionHoldupQueue.queue.add('HoldupDistribution', { reportNo: args[0].reportNo, runCount: 0 });  
-  var delayedCnt = await distributionHoldupQueue.queue.getDelayedCount();
-  var failedCnt = await distributionHoldupQueue.queue.getFailedCount();
-  console.log(`Holdup queue job count: ${delayedCnt}, ${failedCnt}`);
+  //var delayedCnt = await distributionHoldupQueue.queue.getDelayedCount();
+  //var failedCnt = await distributionHoldupQueue.queue.getFailedCount();
+  //console.log(`Holdup queue job count: ${delayedCnt}, ${failedCnt}`);
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` })
 }
 
+/*
 distributionHoldupQueue.worker.on('completed', async (job) => {
   console.log(`Holding up distribution is complete for: ${job.data.reportNo}`);  
   var aoResult = await mawdApi.getAccessionOrder(job.data.reportNo);
@@ -45,6 +46,7 @@ reportPublishingQueue.worker.on('completed', async (job) => {
 distributionStatusUpdateQueue.worker.on('completed', async (job) => {
   console.log(`Distribution status as been updated for: ${job.data.reportNo}`);
 });
+*/
 
 distributionRouter.submitJob = submitJob;
 export default distributionRouter;
