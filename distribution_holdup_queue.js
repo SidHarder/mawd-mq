@@ -1,5 +1,6 @@
 import { Queue } from 'bullmq';
 import { Worker } from 'bullmq';
+import { QueueScheduler } from 'bullmq';
 import IORedis from 'ioredis';
 
 const connection = new IORedis({ port: 6379, host: "127.0.0.1", db: process.env.REDIS_DB, maxRetriesPerRequest: null });
