@@ -26,9 +26,11 @@ async function getAccessionOrder (reportNo) {
     headers: { 'Content-Type': 'application/json' }
   });
     
-  const data = await response.json();  
-  console.log(data);
-  data.result.lockAquiredByMe = (data.result.accessionOrder.lockedBy == process.env.LOCKED_BY_USER);  
+  const data = await response.json();    
+  if(data.result.accessionOrder) {
+    data.result.lockAquiredByMe = (data.result.accessionOrder.lockedBy == process.env.LOCKED_BY_USER);  
+  }
+  
   return data;
 }
 
