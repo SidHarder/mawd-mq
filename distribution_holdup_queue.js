@@ -1,24 +1,14 @@
-import { Queue } from 'bullmq';
-import { Worker } from 'bullmq';
-import { QueueScheduler } from 'bullmq';
-import IORedis from 'ioredis';
+var Queue = require('bull');
+var redisConfig = { redis: { port: 6379, host: '127.0.0.1', db: process.env.BULL_REDIS_DB } }
 
-const connection = new IORedis({ port: 6379, host: "127.0.0.1", db: process.env.REDIS_DB, maxRetriesPerRequest: null });
+var mawdApi = require('./mawd_api.js');
+var queue = new Queue('distribution_holdup_queue', redisConfig);
 
-const queue = new Queue('Distribution_Holdup', {
-  connection,
-  defaultJobOptions: { removeOnComplete: true }
+queue.process(function (job, done) {  
+  console.log(`Processing distribution for: ${job.data.reportNo}`);
+  done();
 });
-
-console.log('***************************************')
-const worker = new Worker('Distribution_Holdup', handleJob, { connection });
-const queueScheduler = new QueueScheduler('queue_scheduler');
-
-async function handleJob(job) {      
-  console.log(`Worker is handling Job: ${job.id}`);
-}
 
 const distributionHoldupQueue = {};
 distributionHoldupQueue.queue = queue;
-distributionHoldupQueue.worker = worker;
-export default distributionHoldupQueue;
+module.exports = distributionHoldupQueue;

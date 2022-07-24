@@ -1,35 +1,25 @@
-import moment from 'moment';
-import { Queue } from 'bullmq';
-import { Worker } from 'bullmq';
-import IORedis from 'ioredis';
-import mawdApi from './mawd_api.js';
+var Queue = require('bull');
+var moment = require('moment');
+var mawdApi = require('./mawd_api.js');
 
-const connection = new IORedis({ port: 6379, host: "127.0.0.1", db: process.env.REDIS_DB, maxRetriesPerRequest: null });
-const queue = new Queue('Distribution_Status_Update', {
-  connection,
-  defaultJobOptions: { removeOnComplete: true }
-});
+var redisConfig = { redis: { port: 6379, host: '127.0.0.1', db: process.env.BULL_REDIS_DB } }
+var queue = new Queue('distribution_update_status_queue', redisConfig);
 
-const worker = new Worker('Distribution_Status_Update', handleJob, { connection });
-
-async function handleJob(job) {
+queue.process(function (job, done) {
   console.log(`Handling distribution status update for: ${job.data.reportNo}`);
-  try {
-    job.data.accessionOrder.testOrders.find(t => t.reportNo == job.data.reportNo).testOrderReportDistribution.forEach(d => {
-      if (d.distributed == false) {
-        d.distributed = true;
-        d.timeOfLastDistribution = moment().format('YYYYMMDDHHmmss')
-      }
-    });
-
-    job.data.accessionOrder.distributed = true;
-    var updatedAo = await mawdApi.updateAccessionOrder(job.data.accessionOrder);
-  } catch (e) {
-    console.log(e);
-  }
-}
+  job.data.accessionOrder.testOrders.find(t => t.reportNo == job.data.reportNo).testOrderReportDistribution.forEach(d => {
+    if (d.distributed == false) {
+      d.distributed = true;
+      d.timeOfLastDistribution = moment().format('YYYYMMDDHHmmss')
+    }
+  });
+  job.data.accessionOrder.distributed = true;
+  mawdApi.updateAccessionOrder(job.data.accessionOrder, function (error, result) {
+    if(error) { console.log(error); }    
+    done();
+  });  
+});
 
 const distributionStatusUpdateQueue = {};
 distributionStatusUpdateQueue.queue = queue;
-distributionStatusUpdateQueue.worker = worker;
-export default distributionStatusUpdateQueue;
+module.exports = distributionStatusUpdateQueue;

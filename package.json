@@ -1,16 +1,1 @@
-{
-  "type": "module",
-  "dependencies": {
-    "bson-objectid": "^2.0.3",
-    "bullmq": "^1.81.4",
-    "dotenv": "^16.0.1",
-    "ioredis": "^5.0.4",
-    "jayson": "^3.6.6",
-    "moment": "^2.29.3",
-    "node-cron": "^3.0.0",
-    "node-fetch": "^3.2.4"
-  },
-  "devDependencies": {
-    "@types/node": "^17.0.31"
-  }
-}
+{"dependencies":{"bson-objectid":"^2.0.3","bull":"^4.8.4","dotenv":"^16.0.1","ioredis":"^5.0.4","jayson":"^3.6.6","moment":"^2.29.3","node-cron":"^3.0.0","node-fetch":"^3.2.4","request":"^2.88.2"},"devDependencies":{"@types/node":"^17.0.31"}}

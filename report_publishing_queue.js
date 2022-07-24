@@ -1,34 +1,36 @@
-import fetch from 'node-fetch';
+var Queue = require('bull');
 
-import { Queue } from 'bullmq';
-import { Worker } from 'bullmq';
-import IORedis from 'ioredis';
-import mawdApi from './mawd_api.js';
+var request = require('request');
+var mawdApi = require('./mawd_api.js');
 
-const connection = new IORedis({ port: 6379, host: "127.0.0.1", db: process.env.REDIS_DB, maxRetriesPerRequest: null });
-const queue = new Queue('ReportPublishing', {
-  connection,
-  defaultJobOptions: { removeOnComplete: true }
+var redisConfig = { redis: { port: 6379, host: '127.0.0.1', db: process.env.BULL_REDIS_DB } }
+var queue = new Queue('report_publishing_queue', redisConfig);
+
+queue.process(function (job, done) {
+  console.log(`Publishing for: ${job.data.reportNo}`);
+  var publishUrl = `${process.env.HTTP_REPORT_PUBLISH_URL}${job.data.reportNo}`;
+  if (process.env.ENVIRONMENT_NAME == 'dev' ) {
+    console.log('Environment is dev, skipping publish.');
+    return done();
+  }
+
+  console.log(publishUrl);
+  request.get(
+    {
+      headers: { 'Content-Type': 'text/plain' },
+      url: publishUrl,
+      strictSSL: false
+    },
+    function (error, response) {      
+      if (error) {
+        console.log(error)
+        return done()
+      }
+      console.log(`Publish server response: ${response.body}`);
+      done();
+    });  
 });
-
-const worker = new Worker('ReportPublishing', handleJob, { connection });
-
-async function handleJob(job) {  
-  console.log(`Publishing report for: ${job.data.reportNo}`);
-  var url = `${process.env.HTTP_REPORT_PUBLISH_URL}${job.data.reportNo}`;
-  console.log(url);
-
-  if (process.env.ENVIRONMENT_NAME != 'dev')
-  try {
-    const response = await fetch(url);
-    const body = await response.text();
-    console.log(body);
-  } catch (e) {
-    console.log(e);
-  }  
-}
 
 const reportPublishingQueue = {};
 reportPublishingQueue.queue = queue;
-reportPublishingQueue.worker = worker;
-export default reportPublishingQueue;
+module.exports = reportPublishingQueue;

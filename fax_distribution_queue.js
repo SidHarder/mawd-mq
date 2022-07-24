@@ -1,20 +1,12 @@
-import moment from 'moment';
-import cron from 'node-cron';
-import fetch from 'node-fetch';
+var moment = require('moment');
+var cron = require('node-cron');
+var request = require('request');
 
-import { Queue } from 'bullmq';
-import { Worker } from 'bullmq';
-import IORedis from 'ioredis';
-import mawdApi from './mawd_api.js';
+var mawdApi = require('./mawd_api.js');
+var Queue = require('bull');
 
-const connection = new IORedis({ port: 6379, host: "127.0.0.1", db: process.env.REDIS_DB, maxRetriesPerRequest: null });
-
-const queue = new Queue('FaxDistribution', {
-  connection,
-  defaultJobOptions: { removeOnComplete: true }
-});
-
-const worker = new Worker('FaxDistribution', null, { autorun: true, connection });
+var redisConfig = { redis: { port: 6379, host: '127.0.0.1', db: process.env.BULL_REDIS_DB } }
+var queue = new Queue('fax_distribution', redisConfig);
 
 /*
 cron.schedule('* * * * *', async () => {
@@ -27,32 +19,49 @@ cron.schedule('* * * * *', async () => {
 });
 */
 
-async function SendFax(faxJob) {  
-  var url = `${process.env.HTTP_SINGLE_FAX_URL}${faxJob.reportNo}`;
-  console.log(`Faxing: ${url}`);  
+queue.process(function (job, done) {
+  console.log(`Faxing report for: ${job.data.reportNo}`);  
+  var url = `${process.env.HTTP_REPORT_MULTIPLE_FAX}${job.data.faxNumber}/${job.data.reportNo}`;
+  console.log(url);
 
-  try {
-    const response = await fetch(url);
-    const body = await response.text();
-    console.log(body);
-  } catch (e) {
-    console.log(e);
-  }  
-}
+  if (process.env.ENVIRONMENT_NAME == 'dev') {
+    console.log('Environment is dev, skipping fax.');
+    return done();
+  }
 
-async function addFaxJob(data) {    
+  request.get(
+    {
+      headers: { 'Content-Type': 'text/plain' },
+      url: url,
+      strictSSL: false
+    },
+    function (error, response) {
+      if (error) {
+        console.log(error)
+        return done()
+      }
+      console.log(`Fax server response: ${response.body}`);
+      done();
+    });
+
+  done();
+});
+
+function addFaxJob(data) {    
   var testOrder = data.accessionOrder.testOrders.find(t => t.reportNo == data.reportNo);
   var faxDistributions = testOrder.testOrderReportDistribution.filter(t => t.distributionType == 'Fax' && t.distributed == false);
-  
+  console.log(`Fax distribution count: ${faxDistributions.length}`);
+
   for(var i=0; i<faxDistributions.length; i++) {
     var faxJob = { reportNo: faxDistributions[i].reportNo, faxNumber: faxDistributions[i].faxNumber, clientName: faxDistributions[i].clientName };
     if (process.env.ENVIRONMENT_NAME == 'dev' || process.env.ENVIRONMENT_NAME == 'test') faxJob.faxNumber = process.env.TEST_FAX_NUMBER;
 
-    await queue.add('FaxDistribution', faxJob);
-    console.log(`Adding fax distribution for: ${faxJob.reportNo} - ${faxJob.clientName}`);    
+    queue.add(faxJob, function(error, result) {
+      console.log(`Adding fax distribution for: ${faxJob.reportNo} - ${faxJob.clientName}`);    
+    });    
   } 
 }
 
 const faxDistributionQueue = {};
 faxDistributionQueue.addFaxJob = addFaxJob;
-export default faxDistributionQueue;
+module.exports = faxDistributionQueue;

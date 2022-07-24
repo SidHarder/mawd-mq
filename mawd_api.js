@@ -1,14 +1,14 @@
-import fetch from 'node-fetch';
-import ObjectID from 'bson-objectid';
+var request = require('request');
+var ObjectID = require('bson-objectid');
 
 const mawdApi = {}
 
-async function getAccessionOrder (reportNo) {  
+function getAccessionOrder(reportNo, cb) {  
   var apiRequest = {
     jsonrpc: '2.0',
     id: ObjectID(),
     method: 'domainOperation',
-    params: [{      
+    params: [{
       domainOperation: {
         target: 'accessionOrder',
         method: 'getByReportNo',
@@ -19,22 +19,21 @@ async function getAccessionOrder (reportNo) {
       }
     }]
   }
-  
-  const response = await fetch(process.env.MAWD_API_URL, {
+
+  request.post(process.env.MAWD_API_URL, {
     method: 'POST',
     body: JSON.stringify(apiRequest),
     headers: { 'Content-Type': 'application/json' }
+  }, function (error, response, body) {    
+    var data = JSON.parse(body);        
+    if (data.result.accessionOrder) {
+      data.result.lockAquiredByMe = (data.result.accessionOrder.lockedBy == process.env.LOCKED_BY_USER);
+      cb(null, data);
+    }
   });
-    
-  const data = await response.json();    
-  if(data.result.accessionOrder) {
-    data.result.lockAquiredByMe = (data.result.accessionOrder.lockedBy == process.env.LOCKED_BY_USER);  
-  }
-  
-  return data;
 }
 
-async function updateAccessionOrder(accessionOrder) {
+async function updateAccessionOrder(accessionOrder, cb) {
   var apiRequest = {
     jsonrpc: '2.0',
     id: ObjectID(),
@@ -44,22 +43,27 @@ async function updateAccessionOrder(accessionOrder) {
         target: 'accessionOrder',
         method: 'update',
         clinicalPathologyStyle: true,
-        releaseLock: true ,
-        accessionOrder: accessionOrder       
+        releaseLock: true,
+        accessionOrder: accessionOrder
       }
     }]
   }
 
-  const response = await fetch(process.env.MAWD_API_URL, {
+  request.post(process.env.MAWD_API_URL, {
     method: 'POST',
     body: JSON.stringify(apiRequest),
     headers: { 'Content-Type': 'application/json' }
-  });
-
-  const data = await response.json();
-  return data;
+  }, function (error, response, body) {
+    if(error) {
+      console.log(error);
+      return cb(null, { status: 'ERROR', error })
+    }    
+    var data = JSON.parse(body);
+    cb(null, data);
+  });  
 }
 
+/*
 async function submitInfinityResult(apiParams) {
   var apiRequest = {
     jsonrpc: '2.0',
@@ -75,15 +79,16 @@ async function submitInfinityResult(apiParams) {
     body: JSON.stringify(apiRequest),
     headers: { 'Content-Type': 'application/json' }
   });
-  
+
   try {
-    const data = await response.json();    
+    const data = await response.json();
   } catch (e) {
     console.log(e);
-  }      
+  }
 }
+*/
 
 mawdApi.getAccessionOrder = getAccessionOrder;
 mawdApi.updateAccessionOrder = updateAccessionOrder;
-mawdApi.submitInfinityResult = submitInfinityResult;
-export default mawdApi;
+//mawdApi.submitInfinityResult = submitInfinityResult;
+module.exports = mawdApi;
