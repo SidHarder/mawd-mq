@@ -21,7 +21,7 @@ cron.schedule('* * * * *', async () => {
 
 queue.process(function (job, done) {
   console.log(`Faxing report for: ${job.data.reportNo}`);  
-  var url = `${process.env.HTTP_REPORT_MULTIPLE_FAX}${job.data.faxNumber}/${job.data.reportNo}`;
+  var url = `${process.env.HTTP_REPORT_MULTIPLE_FAX}${job.data.reportNo}/${job.data.faxNumber}`;
   console.log(url);
 
   if (process.env.ENVIRONMENT_NAME == 'dev') {
