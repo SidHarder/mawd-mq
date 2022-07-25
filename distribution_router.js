@@ -23,8 +23,12 @@ distributionHoldupQueue.queue.on('completed', function (job, result) {
         var jobData = { accessionOrder: aoResult.result.accessionOrder, reportNo: job.data.reportNo };
         reportPublishingQueue.queue.add(jobData);
       } else {
-        distributionHoldupQueue.queue.add({ reportNo: job.data.reportNo, runCount: job.data.runCount + 1 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
-        console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount}`);
+        if (job.data.runCount < 100) {
+          distributionHoldupQueue.queue.add({ reportNo: job.data.reportNo, runCount: job.data.runCount + 1 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
+          console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount}`);
+        } else {
+          console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount} was exceeded.`);
+        }        
       }
     } else {
       console.log(`Not able to find Accession Order for: ${job.data.reportNo}`);
