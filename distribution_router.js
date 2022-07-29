@@ -5,6 +5,7 @@ var distributionHoldupQueue = require('./distribution_holdup_queue.js');
 var reportPublishingQueue = require('./report_publishing_queue.js');
 var distributionStatusUpdateQueue = require('./distribution_status_update_queue.js');
 var faxDistributionQueue = require('./fax_distribution_queue.js');
+var interfaceDistributionQueue = require('./interface_distribution_queue.js');
 
 const distributionRouter = {};
 
@@ -38,7 +39,8 @@ distributionHoldupQueue.queue.on('completed', function (job, result) {
 
 reportPublishingQueue.queue.on('completed', function (job) {
   console.log(`Report Publishing Completed for: ${job.data.reportNo}`);  
-  faxDistributionQueue.addFaxJob(job.data);
+  faxDistributionQueue.addFaxJob(job.data);  
+  interfaceDistributionQueue.queue.add(job.data);
   distributionStatusUpdateQueue.queue.add(job.data);
 });
 
