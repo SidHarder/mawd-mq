@@ -49,7 +49,12 @@ queue.process(function (job, done) {
 
 function addFaxJob(data) {    
   var testOrder = data.accessionOrder.testOrders.find(t => t.reportNo == data.reportNo);
-  var faxDistributions = testOrder.testOrderReportDistribution.filter(t => t.distributionType == 'Fax' && t.distributed == false);
+  var faxDistributions = []
+  if (data.distributionMode == 'distribute_undistributed_items_only') {
+    faxDistributions = testOrder.testOrderReportDistribution.filter(t => t.distributionType == 'Fax' && t.distributed == false);
+  } else {
+    faxDistributions = testOrder.testOrderReportDistribution.filter(t => t.distributionType == 'Fax');
+  }
   console.log(`Fax distribution count: ${faxDistributions.length}`);
 
   for(var i=0; i<faxDistributions.length; i++) {

@@ -9,9 +9,18 @@ var interfaceDistributionQueue = require('./interface_distribution_queue.js');
 
 const distributionRouter = {};
 
-function submitJob(args, cb) {    
+function submitJob(args, cb) {  
+  var reportNo = args.reportNo;
+  if (!reportNo) {
+    console.log(`The reportNo was not provided as an argument.`);
+    return cb(null, { status: 'ERROR', message: `The reportNo was not provided as an argument.` });
+  }
+
+  var distributionMode = args.distributionMode;
+  if (!distributionMode) distributionMode = 'distribute_undistributed_items_only'
+
   console.log(`Holding up distribution for: ${args[0].reportNo}`);
-  distributionHoldupQueue.queue.add({ reportNo: args[0].reportNo, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
+  distributionHoldupQueue.queue.add({ reportNo: args[0].reportNo, distributionMode: distributionMode, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` });  
 }
 
@@ -21,11 +30,11 @@ distributionHoldupQueue.queue.on('completed', function (job, result) {
     if (!error) {
       if (aoResult.result.lockAquiredByMe == true) {
         console.log(`Accession found for: ${job.data.reportNo}, and lockAquiredByMe is: ${aoResult.result.lockAquiredByMe}`)
-        var jobData = { accessionOrder: aoResult.result.accessionOrder, reportNo: job.data.reportNo };
+        var jobData = { accessionOrder: aoResult.result.accessionOrder, reportNo: job.data.reportNo, distributionMode: job.data.distributionMode };
         reportPublishingQueue.queue.add(jobData);
       } else {
         if (job.data.runCount < 100) {
-          distributionHoldupQueue.queue.add({ reportNo: job.data.reportNo, runCount: job.data.runCount + 1 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
+          distributionHoldupQueue.queue.add({ reportNo: job.data.reportNo, distributionMode: jog.data.distributionMode, runCount: job.data.runCount + 1 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
           console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount}`);
         } else {
           console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount} was exceeded.`);

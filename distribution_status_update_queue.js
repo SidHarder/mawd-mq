@@ -8,10 +8,15 @@ var queue = new Queue('distribution_update_status_queue', redisConfig);
 queue.process(function (job, done) {
   console.log(`Handling distribution status update for: ${job.data.reportNo}`);
   job.data.accessionOrder.testOrders.find(t => t.reportNo == job.data.reportNo).testOrderReportDistribution.forEach(d => {
-    if (d.distributed == false) {
+    if (job.data.distributionMode == 'distribute_undistributed_items_only') {
+      if (d.distributed == false) {
+        d.distributed = true;
+        d.timeOfLastDistribution = moment().format('YYYYMMDDHHmmss')
+      }
+    } else {
       d.distributed = true;
       d.timeOfLastDistribution = moment().format('YYYYMMDDHHmmss')
-    }
+    }    
   });
   job.data.accessionOrder.distributed = true;
   mawdApi.updateAccessionOrder(job.data.accessionOrder, function (error, result) {
