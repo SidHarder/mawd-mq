@@ -24,7 +24,8 @@ queue.process(function (job, done) {
     }]
   }
 
-  console.log('123123123')
+  console.log(apiRequest);
+  
   request.post(process.env.MAWD_API_URL, {
     method: 'POST',
     body: JSON.stringify(apiRequest),
