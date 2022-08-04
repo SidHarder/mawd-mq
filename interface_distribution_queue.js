@@ -25,10 +25,6 @@ queue.process(function (job, done) {
     }]
   }
 
-  console.log(apiRequest);
-  done();
-
-  /*
   request.post(process.env.MAWD_API_URL, {
     method: 'POST',
     body: JSON.stringify(apiRequest),
@@ -39,7 +35,6 @@ queue.process(function (job, done) {
     console.log(body);
     done();
   });    
-  */
 });
 
 const interfaceDistributionQueue = {};
