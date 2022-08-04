@@ -10,8 +10,9 @@ var redisConfig = { redis: { port: 6379, host: '127.0.0.1', db: process.env.BULL
 var queue = new Queue('interface_distribution', redisConfig);
 
 queue.process(function (job, done) {
-  console.log(`Sending interface distribution for: ${job.data.reportNo}`);    
+  console.log(`Sending interface  dddd distribution for: ${job.data.reportNo}`);    
 
+  /*
   var apiRequest = {
     jsonrpc: '2.0',
     id: ObjectID(),
@@ -24,8 +25,9 @@ queue.process(function (job, done) {
       }
     }]
   }
+  */
 
-  console.log(apiRequest);
+  console.log('Hello');
   done();
 
   /*
