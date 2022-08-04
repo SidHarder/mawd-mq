@@ -12,7 +12,7 @@ var queue = new Queue('interface_distribution', redisConfig);
 queue.process(function (job, done) {
   console.log(`Sending interface distribution for: ${job.data.reportNo}`);    
 
-  var id = ObjectID();
+  var id = ObjectID("54495ad94c934721ede76d90");
 
   var apiRequest = {
     jsonrpc: '2.0',
@@ -28,7 +28,7 @@ queue.process(function (job, done) {
   }
 
   console.log(apiRequest);
-  
+
   request.post(process.env.MAWD_API_URL, {
     method: 'POST',
     body: JSON.stringify(apiRequest),
