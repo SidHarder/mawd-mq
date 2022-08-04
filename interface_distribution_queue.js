@@ -28,13 +28,10 @@ queue.process(function (job, done) {
     body: JSON.stringify(apiRequest),
     headers: { 'Content-Type': 'application/json' }
   }, function (error, response, body) {
-    var data = JSON.parse(body);
-    if (data.result.accessionOrder) {
-      data.result.lockAquiredByMe = (data.result.accessionOrder.lockedBy == process.env.LOCKED_BY_USER);
-      cb(null, data);
-    }
-  });  
-  done();
+    if(error) console.log(error);     
+    console.log(body);
+    done();
+  });    
 });
 
 const interfaceDistributionQueue = {};
