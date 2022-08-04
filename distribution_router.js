@@ -9,8 +9,8 @@ var interfaceDistributionQueue = require('./interface_distribution_queue.js');
 
 const distributionRouter = {};
 
-function submitJob(args, cb) {  
-  var reportNo = args.reportNo;
+function submitJob(args, cb) {    
+  var reportNo = args[0].reportNo;
   if (!reportNo) {
     console.log(`The reportNo was not provided as an argument.`);
     return cb(null, { status: 'ERROR', message: `The reportNo was not provided as an argument.` });
@@ -19,9 +19,9 @@ function submitJob(args, cb) {
   var distributionMode = args.distributionMode;
   if (!distributionMode) distributionMode = 'distribute_undistributed_items_only'
 
-  console.log(`Holding up distribution for: ${args[0].reportNo}`);
-  distributionHoldupQueue.queue.add({ reportNo: args[0].reportNo, distributionMode: distributionMode, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
-  cb(null, { status: 'OK', message: `Distrubition job submitted for: ${args[0].reportNo}` });  
+  console.log(`Holding up distribution for: ${reportNo}`);
+  distributionHoldupQueue.queue.add({ reportNo: reportNo, distributionMode: distributionMode, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
+  cb(null, { status: 'OK', message: `Distrubition job submitted for: ${reportNo}` });  
 }
 
 distributionHoldupQueue.queue.on('completed', function (job, result) {
