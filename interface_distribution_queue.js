@@ -10,13 +10,11 @@ var redisConfig = { redis: { port: 6379, host: '127.0.0.1', db: process.env.BULL
 var queue = new Queue('interface_distribution', redisConfig);
 
 queue.process(function (job, done) {
-  console.log(`Sending interface distribution for: ${job.data.reportNo}`);    
-
-  var id = ObjectID("54495ad94c934721ede76d90");
+  console.log(`Sending interface distribution for: ${job.data.reportNo}`);      
 
   var apiRequest = {
     jsonrpc: '2.0',
-    id: id,
+    id: ObjectID(),
     method: 'interfaceEngineOperation',
     params: [{
       interfaceEngineOperation: {
@@ -26,8 +24,6 @@ queue.process(function (job, done) {
       }
     }]
   }
-
-  console.log(apiRequest);
 
   request.post(process.env.MAWD_API_URL, {
     method: 'POST',
