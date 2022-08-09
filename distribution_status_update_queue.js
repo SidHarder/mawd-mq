@@ -7,6 +7,7 @@ var queue = new Queue('distribution_update_status_queue', redisConfig);
 
 queue.process(function (job, done) {
   console.log(`Handling distribution status update for: ${job.data.reportNo}`);
+  console.log(`Updating distribution mode: ${job.data.distributionMode}`);
   job.data.accessionOrder.testOrders.find(t => t.reportNo == job.data.reportNo).testOrderReportDistribution.forEach(d => {
     if (job.data.distributionMode == 'distribute_undistributed_items_only') {
       if (d.distributed == false) {
