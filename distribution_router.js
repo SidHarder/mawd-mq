@@ -19,6 +19,7 @@ function submitJob(args, cb) {
   var distributionMode = args.distributionMode;
   if (!distributionMode) distributionMode = 'distribute_undistributed_items_only'
 
+  console.log(`Distribution Mode: ${distributionMode}`);
   console.log(`Holding up distribution for: ${reportNo}`);
   distributionHoldupQueue.queue.add({ reportNo: reportNo, distributionMode: distributionMode, runCount: 0 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
   cb(null, { status: 'OK', message: `Distrubition job submitted for: ${reportNo}` });  
