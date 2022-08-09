@@ -32,10 +32,9 @@ distributionHoldupQueue.queue.on('completed', function (job, result) {
         console.log(`Accession found for: ${job.data.reportNo}, and lockAquiredByMe is: ${aoResult.result.lockAquiredByMe}`)
         var jobData = { accessionOrder: aoResult.result.accessionOrder, reportNo: job.data.reportNo, distributionMode: job.data.distributionMode };
         reportPublishingQueue.queue.add(jobData);
-      } else {
-        console.log(job.data.runCount < 100);
+      } else {        
         if (job.data.runCount < 100) {
-          distributionHoldupQueue.queue.add({ reportNo: job.data.reportNo, distributionMode: jog.data.distributionMode, runCount: job.data.runCount + 1 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
+          distributionHoldupQueue.queue.add({ reportNo: job.data.reportNo, distributionMode: job.data.distributionMode, runCount: job.data.runCount + 1 }, { delay: parseInt(process.env.HOLD_UP_QUEUE_DELAY) });
           console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount}`);
         } else {
           console.log(`Lock not aquired for: ${job.data.reportNo}, lock is held by: ${aoResult.result.accessionOrder.lockedBy}, Run Count: ${job.data.runCount} was exceeded.`);

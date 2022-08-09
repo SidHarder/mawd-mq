@@ -50,6 +50,7 @@ queue.process(function (job, done) {
 function addFaxJob(data) {    
   var testOrder = data.accessionOrder.testOrders.find(t => t.reportNo == data.reportNo);
   var faxDistributions = []
+  console.log(`Distribution Mode for faxing: ${data.distributionMode}`);
   if (data.distributionMode == 'distribute_undistributed_items_only') {
     faxDistributions = testOrder.testOrderReportDistribution.filter(t => t.distributionType == 'Fax' && t.distributed == false);
   } else {
@@ -60,7 +61,6 @@ function addFaxJob(data) {
   for(var i=0; i<faxDistributions.length; i++) {
     var faxJob = { reportNo: faxDistributions[i].reportNo, faxNumber: faxDistributions[i].faxNumber, clientName: faxDistributions[i].clientName };
     if (process.env.ENVIRONMENT_NAME == 'dev' || process.env.ENVIRONMENT_NAME == 'test') faxJob.faxNumber = process.env.TEST_FAX_NUMBER;
-
     queue.add(faxJob, function(error, result) {
       console.log(`Adding fax distribution for: ${faxJob.reportNo} - ${faxJob.clientName}`);    
     });    
